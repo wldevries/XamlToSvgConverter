@@ -1,0 +1,42 @@
+﻿body {
+    background: #FBFBFB;
+    padding: 20px 40px;
+    margin: 0px;
+}
+
+@media only screen and (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+}
+
+.header-product {
+    font-size: 32px;
+    font-weight: 500;
+    color: #D8D8D8;
+    margin: 30px 0 10px 0;
+    font-family: Helvetica;
+}
+
+.icon-set {
+    display: grid;
+    width: min(90%, 75rem);
+    grid-template-columns: repeat(auto-fill, 200px);
+    /* grid-auto-rows: 80px; */
+    gap: 20px;
+}
+
+.icon {
+    display: flex;
+}
+
+.icon-svg {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+}
+
+.icon-name {
+    margin: auto 0 auto 10px;
+    font-family: Helvetica;
+}
