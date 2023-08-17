@@ -20,8 +20,7 @@
 
 .icon-set {
     display: grid;
-    width: min(90%, 75rem);
-    grid-template-columns: repeat(auto-fill, 200px);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     /* grid-auto-rows: 80px; */
     gap: 20px;
 }
@@ -30,9 +29,10 @@
     display: flex;
 }
 
-.icon-svg {
-    width: 30px;
-    height: 30px;
+.icon-image {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
     margin: 0;
 }
 
