@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -14,6 +15,8 @@ public class SvgConverter
 { 
     public static string? ConvertXamlToSvg(string xamlText)
     {
+        CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
         // parse the xaml
         var xaml = XamlReader.Parse(xamlText) as FrameworkElement;
 
@@ -60,11 +63,18 @@ public class SvgConverter
 
     private static void ProcessPolygon(StringBuilder sb, Polygon polygon)
     {
-        var points = polygon.Points.ToString()
-            .Replace(",", ".").Replace(";", ",");
+        var left = Canvas.GetLeft(polygon);
+        var top = Canvas.GetTop(polygon);
+        left = double.IsNormal(left) ? left : 0;
+        top = double.IsNormal(top) ? top : 0;
+
+        var points = polygon.Points
+            .Select(p => $"{left + p.X},{top + p.Y}")
+            .Aggregate((a, b) => $"{a} {b}");
+
         sb.Append("<polygon points=\"");
         sb.Append(points);
-        sb.Append($"\"");
+        sb.Append("\"");
         AddShapeProperties(sb, polygon);
         sb.AppendLine("/>");
     }
@@ -76,8 +86,10 @@ public class SvgConverter
 
         var cx = double.IsNormal(left) ? left : 0 + ellipse.Width / 2;
         var cy = double.IsNormal(top) ? top : 0 + ellipse.Height / 2;
-        var rx = ellipse.Width / 2;
-        var ry = ellipse.Height / 2;
+
+        // WPF draws the inside the ellipse path, SVG draws on the ellipse path
+        var rx = ellipse.Width / 2 - ellipse.StrokeThickness / 2;
+        var ry = ellipse.Height / 2 - ellipse.StrokeThickness / 2;
          
         sb.Append($"<ellipse cx=\"{cx}\" cy=\"{cy}\" rx=\"{rx}\" ry=\"{ry}\"");
         AddShapeProperties(sb, ellipse);
@@ -96,17 +108,32 @@ public class SvgConverter
 
     private static void ProcessPath(StringBuilder sb, Path path)
     {
-        var pathMarkup = path.Data.GetFlattenedPathGeometry().ToString()
-            .Replace(",", ".").Replace(";", ",");
+        var pathMarkup = path.Data
+            .GetFlattenedPathGeometry()
+            .ToString();
+
         if (pathMarkup.StartsWith("F1"))
             pathMarkup = pathMarkup[2..];
 
-        pathMarkup.Replace(';', ' ');
-
         sb.Append("<path d=\"");
         sb.Append(pathMarkup);
-        sb.Append($"\"");
+        sb.Append('"');
+
         AddShapeProperties(sb, path);
+
+        var left = Canvas.GetLeft(path);
+        var top = Canvas.GetTop(path);
+        if (double.IsNormal(left) || double.IsNormal(top))
+        {
+            left = double.IsNormal(left) ? left : 0;
+            top = double.IsNormal(top) ? top : 0;
+            sb.Append($" transform=\"translate({left},{top})\"");
+        }
+        else if (path.Margin != default)
+        {
+            sb.Append($" transform=\"translate({path.Margin.Left},{path.Margin.Top})\"");
+        }
+
         sb.AppendLine("/>");
     }
 
@@ -117,7 +144,13 @@ public class SvgConverter
         if (shape.Stroke != null)
             sb.Append($" stroke=\"{ToWeb(shape.Stroke)}\"");
         if (double.IsNormal(shape.StrokeThickness))
-            sb.Append($" stroke-width=\"{shape.StrokeThickness}\"");
+            sb.Append($" stroke-width=\"{shape.StrokeThickness.ToString().ToLower()}\"");
+        if (shape.StrokeLineJoin != PenLineJoin.Miter)
+            sb.Append($" stroke-linejoin=\"{ToSvg(shape.StrokeLineJoin)}\"");
+        if (shape.StrokeStartLineCap != PenLineCap.Flat)
+            sb.Append($" stroke-linecap=\"{ToSvg(shape.StrokeStartLineCap)}\"");
+        else if (shape.StrokeEndLineCap != PenLineCap.Flat)
+            sb.Append($" stroke-linecap=\"{ToSvg(shape.StrokeEndLineCap)}\"");
     }
 
     private static List<Shape> FindPaths(FrameworkElement? root, out double? width, out double? height)
@@ -165,6 +198,23 @@ public class SvgConverter
         }
         return paths;
     }
+
+    private static string ToSvg(PenLineJoin penLineJoin) => penLineJoin switch
+    {
+        PenLineJoin.Miter => "miter",
+        PenLineJoin.Bevel => "bevel",
+        PenLineJoin.Round => "round",
+        _ => throw new NotImplementedException(),
+    };
+
+    private static string ToSvg(PenLineCap penLineCap) => penLineCap switch
+    {
+        PenLineCap.Flat => "butt",
+        PenLineCap.Round => "round",
+        PenLineCap.Square => "square",
+        _ => throw new NotImplementedException(),
+    };
+
     public static string ToWeb(Brush brush)
     {
         // assuming it's a solidcolorbrush
