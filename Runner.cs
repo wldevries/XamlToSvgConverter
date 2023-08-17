@@ -1,7 +1,9 @@
 ﻿using Humanizer;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -9,21 +11,51 @@ namespace XamlToSvgConverter;
 
 internal class Runner
 {
-    public const string Source = @"D:\Icons\Set1";
-    public const string Source2 = @"D:\Icons\Set2";
-
     public static void Run()
     {
-        
-        DirectoryInfo sourcedir = new(Source);
-        var flow = ConvertIcons(new(Source2), "Flow");
-        var rephagia = ConvertIcons(new(Source), "Rephagia");
+        List<IconSet> iconSets = new()
+        {
+            ConvertIcons("Bla", @"D:\Icons\Vector")
+        };
 
-        CreateWebPage(new() { flow, rephagia });
+        iconSets.AddRange(GetPngs());
+        iconSets = iconSets
+            .OrderBy(s => s.Name)
+            .ToList();
+
+        CreateWebPage(iconSets);
     }
 
-    private static IconSet ConvertIcons(DirectoryInfo sourcedir, string setName)
+    private static IEnumerable<IconSet> GetPngs()
     {
+        DirectoryInfo root = new(@"Png");
+        foreach (var dir in root.GetDirectories())
+        {
+            List<string> icons = new();
+            var pngs = dir.GetFiles("*.png");
+            if (pngs.Length > 0)
+            {
+                var path = Path.Combine("png", dir.Name);
+                icons.AddRange(pngs.Select(x => Path.Combine(path, x.Name)));
+            }
+
+            foreach (var subdir in dir.GetDirectories())
+            {
+                pngs = subdir.GetFiles("*.png");
+                if (pngs.Length > 0)
+                {
+                    var path = Path.Combine("png", dir.Name, subdir.Name);
+                    icons.AddRange(pngs.Select(x => Path.Combine(path, x.Name)));
+                }
+            }
+
+            yield return new IconSet(dir.Name + "_png", icons);
+        }
+    }
+
+    private static IconSet ConvertIcons(string sourcepath, string setName)
+    {
+        DirectoryInfo sourcedir = new(sourcepath);
         List<string> svgFileNames = new();
 
         foreach (var file in sourcedir.GetFiles("*.xaml"))
@@ -47,7 +79,7 @@ internal class Runner
         return new(setName, svgFileNames);
     }
 
-    public record IconSet(string Product, List<string> Icons);
+    public record IconSet(string Name, List<string> Icons);
 
     private static void CreateWebPage(List<IconSet> sets)
     {
@@ -61,16 +93,22 @@ internal class Runner
 
         foreach (var set in sets)
         {
-            sb.AppendLine($"<h1 class=\"header-product\">{set.Product}</h1>");
+            sb.AppendLine($"<h1 class=\"header-product\">{set.Name}</h1>");
 
             sb.AppendLine("<section class=\"icon-set\">");
 
             foreach (var file in set.Icons)
             {
                 var name = Path.GetFileNameWithoutExtension(file);
-                name = name.Kebaberize();
+                name = name
+                    .Replace("-b-64x64", "", StringComparison.OrdinalIgnoreCase)
+                    .Replace("-64x64", "", StringComparison.OrdinalIgnoreCase)
+                    .Replace("icon", "", StringComparison.OrdinalIgnoreCase)
+                    .Kebaberize()
+                    .Trim('-');
+                ;
                 sb.Append($"<div class=\"icon\">");
-                sb.Append($"<img class=\"icon-svg\" src=\"{file}\" width=\"30\" height=\"30\"/>");
+                sb.Append($"<img class=\"icon-image\" src=\"{file}\" width=\"30\" height=\"30\"/>");
                 sb.Append($"<span class=\"icon-name\">{name}</span>");
                 sb.AppendLine($"</div>");
             }
