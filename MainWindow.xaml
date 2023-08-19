@@ -7,6 +7,35 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Click="Convert">Go</Button>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="325*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Margin="10" TextWrapping="Wrap" Text="XAML source paths" VerticalAlignment="Center" 
+                   FontSize="14" Foreground="#FF373737" FontWeight="Bold"/>
+
+        <ScrollViewer Margin="10 0" Grid.Row="1">
+
+            <ListBox x:Name="xamlIconSourceList">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#333333" />
+                            <TextBlock Text="{Binding Path}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+        </ScrollViewer>
+
+        <StackPanel HorizontalAlignment="Left" Margin="10" Orientation="Horizontal" 
+                    VerticalAlignment="Center" Grid.Row="2">
+            <Button Content="Add" Height="49" Width="72" Click="Add_Click"/>
+            <Button Content="Remove" Height="49" Width="74" Click="Remove_Click" Margin="10 0 0 0"/>
+            <Button Click="Convert" Content="Convert XAML icons" Height="49" Width="145" Margin="10 0 0 0"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace XamlToSvgConverter;
@@ -13,10 +12,11 @@ internal class Runner
 {
     public static void Run()
     {
-        List<IconSet> iconSets = new()
+        var sources = new XamlIconSource[]
         {
-            ConvertIcons("Bla", @"D:\Icons\Vector")
         };
+
+        List<IconSet> iconSets = sources.Select(ConvertIcons).ToList();
 
         iconSets.AddRange(GetPngs());
         iconSets = iconSets
@@ -53,9 +53,9 @@ internal class Runner
         }
     }
 
-    private static IconSet ConvertIcons(string sourcepath, string setName)
+    private static IconSet ConvertIcons(XamlIconSource source)
     {
-        DirectoryInfo sourcedir = new(sourcepath);
+        DirectoryInfo sourcedir = new(source.Path);
         List<string> svgFileNames = new();
 
         foreach (var file in sourcedir.GetFiles("*.xaml"))
@@ -68,18 +68,17 @@ internal class Runner
 
             if (svg != null)
             {
-                Directory.CreateDirectory(setName);
+                Directory.CreateDirectory(source.Name);
 
                 string svgFileName = Path.ChangeExtension(file.Name, ".svg");
-                var svgPath = Path.Combine(setName, svgFileName);
+                var svgPath = Path.Combine(source.Name, svgFileName);
                 File.WriteAllText(svgPath, svg);
                 svgFileNames.Add(svgPath);
             }
         }
-        return new(setName, svgFileNames);
+        return new(source.Name, svgFileNames);
     }
 
-    public record IconSet(string Name, List<string> Icons);
 
     private static void CreateWebPage(List<IconSet> sets)
     {
