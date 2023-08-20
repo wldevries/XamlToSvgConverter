@@ -23,7 +23,7 @@ public class IconHtmlPageCreator
         foreach (var set in sets)
         {
             sb.AppendLine("<section class=\"icon-set\">");
-            sb.AppendLine($"<h1 class=\"header-product\">{set.Name}</h1>");
+            sb.AppendLine($"<h1 class=\"header-product\" id=\"{set.Name}\">{set.Name}</h1>");
 
             sb.AppendLine("<section class=\"icon-set-container\">");
 

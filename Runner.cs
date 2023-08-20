@@ -37,6 +37,6 @@ internal class Runner
                 svgFileNames.Add(svgPath);
             }
         }
-        return new(source.Name, svgFileNames);
+        return new(source.Name, svgFileNames, 1);
     }
 }
