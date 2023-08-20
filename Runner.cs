@@ -10,12 +10,8 @@ namespace XamlToSvgConverter;
 
 internal class Runner
 {
-    public static void Run()
+    public static void Run(IEnumerable<XamlIconSource> sources)
     {
-        var sources = new XamlIconSource[]
-        {
-        };
-
         List<IconSet> iconSets = sources.Select(ConvertIcons).ToList();
 
         iconSets.AddRange(GetPngs());

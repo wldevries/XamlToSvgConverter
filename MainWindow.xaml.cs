@@ -47,7 +47,8 @@ namespace XamlToSvgConverter
 
         private void Convert(object sender, RoutedEventArgs e)
         {
-            Runner.Run();
+            var items = this.xamlIconSourceList.Items.OfType<XamlIconSource>();
+            Runner.Run(items);
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
