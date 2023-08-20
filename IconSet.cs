@@ -36,8 +36,11 @@ public record IconSet(string Name, List<string> Icons, int Depth)
             }
         }
 
-        var setName = setRelativePath.Replace('\\', ' ').Trim();
-        yield return new IconSet(setName, icons, 1);
+        if (icons.Any())
+        {
+            var setName = setRelativePath.Replace('\\', ' ').Trim();
+            yield return new IconSet(setName, icons, 1);
+        }
 
         foreach (var subdir in dir.GetDirectories())
         {

@@ -19,6 +19,13 @@ public class IconHtmlPageCreator
         sb.AppendLine("</head><body>");
         sb.AppendLine(File.ReadAllText("ColorPicker.html"));
 
+        sb.AppendLine("<nav><ul>");
+        foreach (var set in sets)
+        {
+            sb.AppendLine($"<li><a href=\"#{set.Name}\">{set.Name}</a></li>");
+        }
+        sb.AppendLine("</ul></nav>");
+
         sb.AppendLine("<main>");
         foreach (var set in sets)
         {
@@ -38,7 +45,9 @@ public class IconHtmlPageCreator
                     .Trim('-');
                 ;
                 sb.Append($"<div class=\"icon\">");
+                sb.Append($"<div class=\"icon-image-container\">");
                 sb.Append($"<img class=\"icon-image\" src=\"{file}\" alt=\"name\" />");
+                sb.Append($"</div>");
                 sb.Append($"<span class=\"icon-name\">{name}</span>");
                 sb.AppendLine($"</div>");
             }
