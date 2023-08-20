@@ -1,10 +1,7 @@
-﻿using Humanizer;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace XamlToSvgConverter;
 
@@ -19,7 +16,15 @@ internal class Runner
             .OrderBy(s => s.Name)
             .ToList();
 
-        CreateWebPage(iconSets);
+        var file = IconHtmlPageCreator.CreateWebPage(iconSets);
+        using Process p = new()
+        {
+            StartInfo = new ProcessStartInfo(file)
+            {
+                UseShellExecute = true
+            }
+        };
+        p.Start();
     }
 
     private static IEnumerable<IconSet> GetPngs()
@@ -73,43 +78,5 @@ internal class Runner
             }
         }
         return new(source.Name, svgFileNames);
-    }
-
-
-    private static void CreateWebPage(List<IconSet> sets)
-    {
-        StringBuilder sb = new();
-        sb.AppendLine("<!DOCTYPE html><html><head><title>Icons</title>");
-        sb.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\r\n");
-        sb.AppendLine("<style>");
-        sb.AppendLine(File.ReadAllText("style.css"));
-        sb.AppendLine("</style>");
-        sb.AppendLine("</head><body>");
-
-        foreach (var set in sets)
-        {
-            sb.AppendLine($"<h1 class=\"header-product\">{set.Name}</h1>");
-
-            sb.AppendLine("<section class=\"icon-set\">");
-
-            foreach (var file in set.Icons)
-            {
-                var name = Path.GetFileNameWithoutExtension(file);
-                name = name
-                    .Replace("-b-64x64", "", StringComparison.OrdinalIgnoreCase)
-                    .Replace("-64x64", "", StringComparison.OrdinalIgnoreCase)
-                    .Replace("icon", "", StringComparison.OrdinalIgnoreCase)
-                    .Kebaberize()
-                    .Trim('-');
-                ;
-                sb.Append($"<div class=\"icon\">");
-                sb.Append($"<img class=\"icon-image\" src=\"{file}\" width=\"30\" height=\"30\"/>");
-                sb.Append($"<span class=\"icon-name\">{name}</span>");
-                sb.AppendLine($"</div>");
-            }
-            sb.AppendLine("</section>");
-        }
-        sb.AppendLine("</body></html>");
-        File.WriteAllText("index.html", sb.ToString());
     }
 }
