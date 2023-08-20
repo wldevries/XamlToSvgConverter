@@ -17,12 +17,15 @@ public class IconHtmlPageCreator
         sb.AppendLine(File.ReadAllText("style.css"));
         sb.AppendLine("</style>");
         sb.AppendLine("</head><body>");
+        sb.AppendLine(File.ReadAllText("ColorPicker.html"));
 
+        sb.AppendLine("<main>");
         foreach (var set in sets)
         {
+            sb.AppendLine("<section class=\"icon-set\">");
             sb.AppendLine($"<h1 class=\"header-product\">{set.Name}</h1>");
 
-            sb.AppendLine("<section class=\"icon-set\">");
+            sb.AppendLine("<section class=\"icon-set-container\">");
 
             foreach (var file in set.Icons)
             {
@@ -35,13 +38,13 @@ public class IconHtmlPageCreator
                     .Trim('-');
                 ;
                 sb.Append($"<div class=\"icon\">");
-                sb.Append($"<img class=\"icon-image\" src=\"{file}\" width=\"30\" height=\"30\"/>");
+                sb.Append($"<img class=\"icon-image\" src=\"{file}\" alt=\"name\" width=\"30\" height=\"30\"/>");
                 sb.Append($"<span class=\"icon-name\">{name}</span>");
                 sb.AppendLine($"</div>");
             }
-            sb.AppendLine("</section>");
+            sb.AppendLine("</div></section>");
         }
-        sb.AppendLine("</body></html>");
+        sb.AppendLine("</main></body></html>");
 
         string filename = "index.html";
         if (File.Exists(filename))

@@ -1,27 +1,54 @@
-﻿body {
-    background: #FBFBFB;
-    padding: 20px 40px;
-    margin: 0px;
+﻿:root {
+    --primary-base: hsl(231, 70%, 50%);
+    --surface-base: hsl(231, 30%, 96%);
+    --text-base: hsl(231, 20%, 15%);
+    --primary-muted: color-mix( in oklab, var(--primary-base) 80%, var(--surface-base) );
+    --primary-vivid: color-mix( in oklab, var(--primary-base) 80%, var(--text-base) );
+    --surface-muted: color-mix( in oklab, var(--surface-base) 80%, var(--text-base) );
+}
+:root {
+    --brand: hsl(25, 100%, 50%);
+    --primary-base: hsl(231, 70%, 50%);
+    --surface-base: hsl(231, 30%, 96%);
+    --text-base: hsl(231, 20%, 15%);
+    --brand-muted: color-mix(in oklab, var(--brand) 80%, var(--surface-base));
+    --brand-vivid: color-mix(in oklab, var(--brand) 80%, var(--text-base));
+    --primary-muted: color-mix( in oklab, var(--primary-base) 80%, var(--surface-base) );
+    --primary-vivid: color-mix( in oklab, var(--primary-base) 80%, var(--text-base) );
+    --surface-muted: color-mix( in oklab, var(--surface-base) 80%, var(--text-base) );
+    --text-muted: color-mix(in oklab, var(--text-base) 80%, var(--surface-base));
+    --surface-extreme: white;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    background: var(--surface-base);
+    color: var(--text-base);
+}
+
+main {
+    margin: 20px;
 }
 
 @media only screen and (max-width: 600px) {
-    body {
-        padding: 20px;
+    main {
+        margin: 10px;
     }
 }
 
 .header-product {
     font-size: 32px;
-    font-weight: 500;
-    color: #D8D8D8;
+    font-weight: 600;
+    color: var(--text-muted);
     margin: 30px 0 10px 0;
-    font-family: Helvetica;
 }
 
-.icon-set {
+.icon-set-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    /* grid-auto-rows: 80px; */
     gap: 20px;
 }
 
@@ -34,9 +61,66 @@
     height: 60px;
     object-fit: contain;
     margin: 0;
+    background: var(--surface-extreme);
 }
 
 .icon-name {
     margin: auto 0 auto 10px;
-    font-family: Helvetica;
+    color: var(--text-base);
+}
+
+.visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+.color-picker > fieldset {
+    border: 0;
+    display: flex;
+    gap: 2rem;
+    width: fit-content;
+    background: #fff;
+    padding: 1rem 3rem;
+    margin-inline: auto;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.color-picker input[type="radio"] {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    outline: 3px solid var(--radio-color, currentColor);
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+.color-picker input[type="radio"]:checked {
+    background-color: var(--radio-color);
+}
+
+.color-picker input[type="radio"]#light {
+    --radio-color: gray;
+}
+
+.color-picker input[type="radio"]#dark {
+    --radio-color: #232323;
+}
+
+:root:has(#light:checked) {
+    --primary-base: #99BC2D;
+    --surface-base: hsl(231, 30%, 96%);
+    --text-base: hsl(231, 20%, 15%);
+    --surface-extreme: white;
+}
+
+:root:has(#dark:checked) {
+    --primary-base: hsl(231, 70%, 50%);
+    --surface-base: hsl(231, 30%, 5%);
+    --text-base: hsl(231, 20%, 85%);
+    --surface-extreme: black;
 }
