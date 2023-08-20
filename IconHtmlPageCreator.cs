@@ -43,10 +43,11 @@ public class IconHtmlPageCreator
                     .Replace("icon", "", StringComparison.OrdinalIgnoreCase)
                     .Kebaberize()
                     .Trim('-');
-                ;
+                var webPath = file.Replace('\\', '/');
+
                 sb.Append($"<div class=\"icon\">");
                 sb.Append($"<div class=\"icon-image-container\">");
-                sb.Append($"<img class=\"icon-image\" src=\"{file}\" alt=\"name\" />");
+                sb.Append($"<img class=\"icon-image\" src=\"{webPath}\" alt=\"name\" />");
                 sb.Append($"</div>");
                 sb.Append($"<span class=\"icon-name\">{name}</span>");
                 sb.AppendLine($"</div>");

@@ -39,6 +39,18 @@ main {
     }
 }
 
+nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-size: .75rem;
+}
+
+nav ul li {
+    list-style: none;
+    color: var(--text-muted);
+}
+
 .header-product {
     font-size: 32px;
     font-weight: 600;
@@ -54,18 +66,24 @@ main {
 
 .icon {
     display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-image-container {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
 }
 
 .icon-image {
-    width: 60px;
-    height: 60px;
     object-fit: contain;
-    margin: 0;
     background: var(--surface-extreme);
+    width: 100%;
+    height: 100%;
 }
 
 .icon-name {
-    margin: auto 0 auto 10px;
     color: var(--text-base);
 }
 
