@@ -8,7 +8,7 @@ namespace XamlToSvgConverter;
 
 public class IconHtmlPageCreator
 {
-    public static string CreateWebPage(IEnumerable<IconSet> sets)
+    public static string CreateWebPage(string directory, IEnumerable<IconSet> sets)
     {
         StringBuilder sb = new();
         sb.AppendLine("<!DOCTYPE html><html><head><title>Icons</title>");
@@ -38,7 +38,7 @@ public class IconHtmlPageCreator
                     .Trim('-');
                 ;
                 sb.Append($"<div class=\"icon\">");
-                sb.Append($"<img class=\"icon-image\" src=\"{file}\" alt=\"name\" width=\"30\" height=\"30\"/>");
+                sb.Append($"<img class=\"icon-image\" src=\"{file}\" alt=\"name\" />");
                 sb.Append($"<span class=\"icon-name\">{name}</span>");
                 sb.AppendLine($"</div>");
             }
@@ -46,7 +46,7 @@ public class IconHtmlPageCreator
         }
         sb.AppendLine("</main></body></html>");
 
-        string filename = "index.html";
+        string filename = Path.Combine(directory, "index.html");
         if (File.Exists(filename))
         {
             filename = GetFilename(filename);
@@ -58,13 +58,24 @@ public class IconHtmlPageCreator
 
     private static string GetFilename(string filename)
     {
+        var dir = Path.GetDirectoryName(filename);
         var name = Path.GetFileNameWithoutExtension(filename);
         var extension = Path.GetExtension(filename);
         int index = 1;
-        while (File.Exists($"{name}{index}{extension}"))
+        while (File.Exists(fullName(name, index, extension)))
         {
             index++;
         }
-        return $"{name}{index}{extension}";
+
+        return fullName(name, index, extension);
+
+        string fullName(string? name, int index, string? extension)
+        {
+            if (dir is null)
+            {
+                return $"{name}{index}{extension}";
+            }
+            return Path.Combine(dir, $"{name}{index}{extension}");
+        }
     }
 }

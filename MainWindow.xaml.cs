@@ -1,5 +1,6 @@
 ﻿using Ookii.Dialogs.Wpf;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -48,7 +49,7 @@ namespace XamlToSvgConverter
         private void Convert(object sender, RoutedEventArgs e)
         {
             var items = this.xamlIconSourceList.Items.OfType<XamlIconSource>();
-            Runner.Run(items);
+            Runner.ConvertIcons(items);
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
@@ -74,6 +75,26 @@ namespace XamlToSvgConverter
             {
                 this.xamlIconSourceList.Items.Remove(selected);
             }
+        }
+
+        private void CreatePage(object sender, RoutedEventArgs e)
+        {
+            VistaFolderBrowserDialog vistaFolderBrowserDialog = new();
+            if (vistaFolderBrowserDialog.ShowDialog() == true)
+            {
+                var directory = vistaFolderBrowserDialog.SelectedPath;
+                var iconSets = IconSet.CreateSetsFrom(directory);
+                var file = IconHtmlPageCreator.CreateWebPage(directory, iconSets);
+                using Process p = new()
+                {
+                    StartInfo = new ProcessStartInfo(file)
+                    {
+                        UseShellExecute = true
+                    }
+                };
+                p.Start();
+            }
+
         }
     }
 }

@@ -86,6 +86,7 @@
             <Button Content="Add" Height="49" Width="72" Click="Add_Click"/>
             <Button Content="Remove" Height="49" Width="74" Click="Remove_Click" Margin="10 0 0 0"/>
             <Button Click="Convert" Content="Convert XAML icons" Height="49" Width="145" Margin="10 0 0 0"/>
+            <Button Click="CreatePage" Content="Create page" Height="49" Width="145" Margin="10 0 0 0"/>
         </StackPanel>
     </Grid>
 </Window>
